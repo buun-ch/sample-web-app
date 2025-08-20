@@ -40,7 +40,7 @@ This is a Next.js 15.4.7 application using the App Router architecture with Type
 
 ### Project Structure
 
-```
+```plain
 app/
 ├── layout.tsx    # Root layout with Geist fonts and metadata
 ├── page.tsx      # Home page component
@@ -58,4 +58,12 @@ app/
 
 - The project uses Turbopack for faster development builds (`--turbo` flag in dev script)
 - Both npm and pnpm lock files exist; pnpm is preferred
-- ESLint is configured with Next.js core web vitals and TypeScript rules using flat config format
+- ESLint is configured with Next.js core web vitals and TypeScript rules using flat config forma
+
+## Code Style
+
+- Follow eslint and prettier rules as defined in the project
+- Follow TypeScript best practices
+- Follow existing code style and conventions in the project
+- Only write code comments when necessary, as the code should be self-explanatory
+- Write output messages and code comments in English

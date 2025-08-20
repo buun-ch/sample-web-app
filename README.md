@@ -1,38 +1,149 @@
 # sample-web-app
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+An example ToDo Application built with Next.js + Drizzle ORM + PostgreSQL
 
-## Getting Started
+## Overview
 
-First, run the development server:
+This is a an example ToDo application built with Next.js 15.4 and Drizzle ORM. It leverages Server Actions for server-side operations and PostgreSQL for data persistence.
+
+## Tech Stack
+
+- **Framework**: Next.js 15.4.7 (App Router)
+- **Language**: TypeScript
+- **ORM**: Drizzle ORM
+- **Database**: PostgreSQL
+- **Styling**: Tailwind CSS v4
+- **Package Manager**: pnpm
+
+## Features
+
+- ✅ Add new todos
+- ✅ Toggle todo completion status
+- ✅ Edit todo text (click to edit)
+- ✅ Delete todos
+- ✅ Display remaining task count
+
+## Setup
+
+### Prerequisites
+
+- Node.js 22.18 or higher
+- pnpm
+- PostgreSQL server
+
+### Installation
+
+#### Clone the repository
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd sample-web-app
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+#### Install dependencies
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+#### Configure environment variables
 
-## Learn More
+Create a `.env.local` file and set your PostgreSQL connection string:
 
-To learn more about Next.js, take a look at the following resources:
+```env
+DATABASE_URL=postgresql://[user]:[password]@[host]:[port]/[database]
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Example:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```env
+DATABASE_URL=postgresql://todo:todopass@localhost:5432/todo
+```
 
-## Deploy on Vercel
+#### Set up the database
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Push the schema to your database:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+pnpm db:push
+```
+
+Or generate and run migrations:
+
+```bash
+pnpm db:generate
+pnpm db:migrate
+```
+
+#### Start the development server
+
+```bash
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) to view the application.
+
+## Available Scripts
+
+```bash
+# Development server (with Turbopack)
+pnpm dev
+
+# Production build
+pnpm build
+
+# Production server
+pnpm start
+
+# Lint code
+pnpm lint
+
+# Drizzle commands
+pnpm db:generate  # Generate migration files
+pnpm db:migrate   # Run migrations
+pnpm db:push      # Push schema directly to database
+pnpm db:studio    # Open Drizzle Studio (GUI for database)
+```
+
+## Project Structure
+
+```plain
+sample-web-app/
+├── app/                   # Next.js App Router
+│   ├── layout.tsx         # Root layout
+│   ├── page.tsx           # Home page (ToDo app)
+│   └── globals.css        # Global styles
+├── src/
+│   ├── actions/           # Server Actions
+│   │   └── todoActions.ts # ToDo CRUD operations
+│   ├── components/        # React components
+│   │   ├── TodoList.tsx   # ToDo list container
+│   │   ├── TodoItem.tsx   # Individual todo item
+│   │   └── AddTodo.tsx    # Add todo form
+│   └── db/                # Database related
+│       ├── schema.ts      # Drizzle schema definition
+│       └── index.ts       # Database connection
+├── drizzle/               # Migration files
+├── drizzle.config.ts      # Drizzle configuration
+└── .env.local             # Environment variables
+```
+
+## Database Schema
+
+```typescript
+todos {
+  id: serial (primary key)
+  text: text (not null)
+  done: boolean (default: false)
+  createdAt: timestamp (default: now)
+  updatedAt: timestamp (default: now)
+}
+```
+
+## Deployment
+
+Build for production with `pnpm build` and start with `pnpm start`.
+
+## License
+
+MIT
