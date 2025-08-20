@@ -140,9 +140,64 @@ todos {
 }
 ```
 
+## Docker
+
+### Building Container Images
+
+#### Production Image
+
+Build the production image:
+
+```bash
+docker build -t sample-web-app:latest .
+```
+
+Run the production container:
+
+```bash
+docker run -d \
+  --name sample-web-app \
+  -p 3000:3000 \
+  -e DATABASE_URL="postgresql://todo:todopass@host.docker.internal:5432/todo" \
+  sample-web-app:latest
+```
+
+#### Development Image
+
+Build the development image:
+
+```bash
+docker build -f Dockerfile.dev -t sample-web-app:dev .
+```
+
+Run the development container with hot reload:
+
+```bash
+docker run -d \
+  --name sample-web-app-dev \
+  -p 3000:3000 \
+  -v $(pwd):/app \
+  -v /app/node_modules \
+  -v /app/.next \
+  -e DATABASE_URL="postgresql://todo:todopass@host.docker.internal:5432/todo" \
+  sample-web-app:dev
+```
+
+### Environment Variables
+
+When running containers, set the `DATABASE_URL` environment variable.
+
 ## Deployment
 
+### Standard Deployment
+
 Build for production with `pnpm build` and start with `pnpm start`.
+
+### Container Deployment
+
+1. Build the production image: `docker build -t sample-web-app:latest .`
+2. Push to your container registry
+3. Deploy to your container platform (Kubernetes, ECS, Cloud Run, etc.)
 
 ## License
 
