@@ -199,6 +199,124 @@ Build for production with `pnpm build` and start with `pnpm start`.
 2. Push to your container registry
 3. Deploy to your container platform (Kubernetes, ECS, Cloud Run, etc.)
 
+Here is an example for pushing images to GHCR (GitHub Container Registry):
+
+```bash
+docker build -t ghcr.io/yourusername/sample-web-app:latest .
+docker push ghcr.io/yourusername/sample-web-app:latest
+
+docker build -f Dockerfile.dev -t ghcr.io/yourusername/sample-web-app:dev .
+docker push ghcr.io/yourusername/sample-web-app:dev
+```
+
+Then you can deploy it using your preferred container orchestration platform.
+
+### Helm Deployment (Kubernetes)
+
+A Helm chart is included in `charts/sample-web-app` for Kubernetes deployment.
+
+#### Helm Prerequisites
+
+- Kubernetes cluster
+- Helm 3.x installed
+- kubectl configured
+
+#### Basic Deployment
+
+1. Create a namespace (optional):
+
+```bash
+kubectl create namespace sample-web-app
+```
+
+2. Create image pull secret if using private registry:
+
+```bash
+kubectl create secret docker-registry regcred \
+  --docker-server=ghcr.io \
+  --docker-username=<your-username> \
+  --docker-password=<your-github-token> \
+  --docker-email=<your-email> \
+  -n sample-web-app
+```
+
+3. Create a `values.yaml` file with your configuration:
+
+```yaml
+# Example values.yaml
+image:
+  imageRegistry: ghcr.io/yourusername
+  repository: sample-web-app
+  tag: latest
+  pullPolicy: IfNotPresent
+
+imagePullSecrets:
+  - name: regcred
+
+env:
+  - name: DATABASE_URL
+    value: "postgresql://todo:todopass@postgres-cluster-rw.postgres:5432/todo"
+
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  hosts:
+    - host: sample.yourdomain.com
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+  tls:
+    - hosts:
+        - sample.yourdomain.com
+```
+
+4. Deploy using Helm:
+
+```bash
+helm upgrade --install sample-web-app ./charts/sample-web-app \
+    -n sample-web-app --wait -f values.yaml
+```
+
+#### Advanced Configuration
+
+You can also use ConfigMaps or Secrets for environment variables:
+
+```yaml
+# Using Secret for DATABASE_URL
+envFrom:
+  - secretRef:
+      name: app-secrets
+```
+
+Create the secret separately:
+
+```bash
+kubectl create secret generic app-secrets \
+    --from-literal=DATABASE_URL="postgresql://todo:todopass@postgres:5432/todo" \
+    -n sample-web-app
+```
+
+#### Verify Deployment
+
+```bash
+# Check pods
+kubectl get pods -n sample-web-app
+
+# Check service
+kubectl get svc -n sample-web-app
+
+# View logs
+kubectl logs -n sample-web-app deployment/sample-web-app
+```
+
+#### Uninstall
+
+```bash
+helm uninstall sample-web-app -n sample-web-app
+```
+
 ## License
 
 MIT

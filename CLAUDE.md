@@ -67,3 +67,4 @@ app/
 - Follow existing code style and conventions in the project
 - Only write code comments when necessary, as the code should be self-explanatory
 - Write output messages and code comments in English
+- Markdown files should be formatted using `markdownlint` rules

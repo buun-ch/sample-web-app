@@ -1,0 +1,8 @@
+settings:
+  yaml:
+    validate: true
+    schemas:
+      # Disable schema validation for Helm values files
+      "": ["charts/*/values.yaml", "charts/*/values-*.yaml", "values-*.yaml"]
+    customTags:
+      - "!reference sequence"

@@ -8,7 +8,7 @@ export default async function TodoList() {
   return (
     <div className="max-w-2xl mx-auto p-6">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
-        Todo App
+        ToDo App
       </h1>
 
       <AddTodo />

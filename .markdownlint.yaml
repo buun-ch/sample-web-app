@@ -4,3 +4,4 @@ line-length: false
 no-inline-html: false
 ul-indent:
   indent: 4
+ol-prefix: false  # Allow numbering style
