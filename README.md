@@ -95,10 +95,43 @@ Open [http://localhost:3000](http://localhost:3000) to view the application.
 
 #### Starting Development with Tilt
 
-Start Tilt with port forwarding:
+Start Tilt by running:
 
 ```bash
-tilt up -- --registry ghcr.io/yourusername --port-forward
+tilt up -- --registry ghcr.io/your-username
+```
+
+If you do not specify a registry, Tilt will use the default registry `localhost:30500`.
+
+If the registry requires authentication, create a secret in your Kubernetes cluster:
+
+```bash
+kubectl create secret docker-registry regcred \
+  --docker-server=ghcr.io \
+  --docker-username=<your-username> \
+  --docker-password=<your-github-token> \
+  --docker-email=<your-email>
+```
+
+(This is an example for GitHub Container Registry; adjust for your registry.)
+
+Then create a `values-dev.yaml` file in the root directory with the following content:
+
+```yaml
+imagePullSecrets:
+  - name: regcred
+```
+
+Run Tilt with the custom values file:
+
+```bash
+tilt up -- --registry ghcr.io/your-username --extra-values-file values-dev.yaml
+```
+
+You can also specify the port forwarding option to access the app locally:
+
+```bash
+tilt up -- --registry ghcr.io/your-username --port-forward
 ```
 
 Then open the URL: `http://localhost:13000`.
@@ -106,7 +139,7 @@ Then open the URL: `http://localhost:13000`.
 If you use Telepresence, you can run:
 
 ```bash
-tilt up -- --registry ghcr.io/yourusername
+tilt up -- --registry ghcr.io/your-username
 ```
 
 Then enable Telepresence connectivity:
