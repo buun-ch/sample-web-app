@@ -1,4 +1,4 @@
-import { getTodos } from '@/src/actions/todoActions';
+import { getTodos } from '@/actions/todoActions';
 import TodoItem from './TodoItem';
 import AddTodo from './AddTodo';
 

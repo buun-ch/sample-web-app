@@ -1,4 +1,4 @@
-import TodoList from '@/src/components/TodoList';
+import TodoList from '@/components/TodoList';
 
 // Force dynamic rendering to prevent database connection during build
 export const dynamic = 'force-dynamic';

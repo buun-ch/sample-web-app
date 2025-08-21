@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { addTodo } from '@/src/actions/todoActions';
+import { addTodo } from '@/actions/todoActions';
 
 export default function AddTodo() {
   const [text, setText] = useState('');
