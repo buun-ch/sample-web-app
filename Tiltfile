@@ -18,7 +18,6 @@ docker_build(
     '.',
     dockerfile='Dockerfile.dev',
     live_update=[
-        # sync('.', '/app', ignore=['node_modules', '.next', '.git', 'charts']),
         sync('.', '/app'),
         run('pnpm install', trigger=['./package.json', './pnpm-lock.yaml']),
     ]
