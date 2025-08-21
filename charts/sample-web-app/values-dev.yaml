@@ -1,0 +1,30 @@
+image:
+  repository: sample-web-app-dev
+  pullPolicy: IfNotPresent
+
+env:
+  - name: NODE_ENV
+    value: "development"
+  - name: DATABASE_URL
+    value: "postgresql://todo:todopass@postgres-cluster-rw.postgres:5432/todo"
+
+ingress:
+  enabled: false
+
+# Enable database migration for development
+migration:
+  enabled: true
+  useAppImage: true
+
+initContainers:
+  - name: db-migrate
+    # Image will use the same as main container (handled in deployment template)
+    command: ['/bin/sh']
+    args: ['/migration/migrate.sh']
+    env:
+      - name: DATABASE_URL
+        value: "postgresql://todo:todopass@postgres-cluster-rw.postgres:5432/todo"
+    volumeMounts:
+      - name: migration-script
+        mountPath: /migration
+    workingDir: /app

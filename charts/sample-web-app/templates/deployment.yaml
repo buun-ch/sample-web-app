@@ -32,6 +32,10 @@ spec:
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.initContainers }}
+      initContainers:
+        {{- include "sample-web-app.initContainers" . | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           {{- with .Values.securityContext }}
@@ -68,8 +72,14 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-      {{- with .Values.volumes }}
       volumes:
+      {{- if .Values.migration.enabled }}
+        - name: migration-script
+          configMap:
+            name: {{ include "sample-web-app.fullname" . }}-migration
+            defaultMode: 0755
+      {{- end }}
+      {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.nodeSelector }}

@@ -99,3 +99,34 @@ imagePullSecrets:
     {{- end }}
 {{- end }}
 {{- end }}
+
+{{/*
+Process init containers and set image if needed
+*/}}
+{{- define "sample-web-app.initContainers" -}}
+{{- range .Values.initContainers }}
+- name: {{ .name }}
+  {{- if not .image }}
+  image: {{ include "sample-web-app.image" $ }}
+  {{- else }}
+  image: {{ .image }}
+  {{- end }}
+  {{- if .command }}
+  command: {{ toJson .command }}
+  {{- end }}
+  {{- if .args }}
+  args: {{ toJson .args }}
+  {{- end }}
+  {{- if .env }}
+  env:
+    {{- toYaml .env | nindent 4 }}
+  {{- end }}
+  {{- if .volumeMounts }}
+  volumeMounts:
+    {{- toYaml .volumeMounts | nindent 4 }}
+  {{- end }}
+  {{- if .workingDir }}
+  workingDir: {{ .workingDir }}
+  {{- end }}
+{{- end }}
+{{- end }}

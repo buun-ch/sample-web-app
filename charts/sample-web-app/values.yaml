@@ -140,3 +140,14 @@ envFrom: []
 #     name: my-config
 # - secretRef:  # yamllint disable-line
 #     name: my-secret
+
+# Init containers to run before the main container
+initContainers: []
+
+# Database migration settings
+migration:
+  enabled: false
+  # Use the same image as the main application
+  useAppImage: true
+  # Or specify a custom image for migration
+  image: ""

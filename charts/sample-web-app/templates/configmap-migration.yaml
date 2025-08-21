@@ -1,0 +1,30 @@
+{{- if .Values.migration.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "sample-web-app.fullname" . }}-migration
+  labels:
+    {{- include "sample-web-app.labels" . | nindent 4 }}
+data:
+  migrate.sh: |
+    #!/bin/sh
+    set -e
+
+    echo "Starting database migration..."
+
+    # Install pnpm if not present
+    if ! command -v pnpm &> /dev/null; then
+      echo "Installing pnpm..."
+      npm install -g pnpm
+    fi
+
+    # Install dependencies
+    echo "Installing dependencies..."
+    pnpm install --frozen-lockfile
+
+    # Run migration
+    echo "Running database migration..."
+    pnpm db:push
+
+    echo "Migration completed successfully"
+{{- end }}

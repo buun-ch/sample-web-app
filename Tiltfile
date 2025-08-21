@@ -8,10 +8,10 @@ config.define_bool('port-forward')
 
 cfg = config.parse()
 
-registry = cfg.get('registry', 'ghcr.io/your-username')
-default_registry(registry)
-
 load('ext://helm_resource', 'helm_resource', 'helm_repo')
+
+registry = cfg.get('registry', 'localhost:30500')
+default_registry(registry)
 
 docker_build(
     'sample-web-app-dev',
@@ -27,7 +27,7 @@ helm_resource(
     'sample-web-app',
     './charts/sample-web-app',
     release_name='sample-web-app-tilt',
-    flags=['--values=./values-dev.yaml'],
+    flags=['--values=./charts/sample-web-app/values-dev.yaml'],
     image_deps=['sample-web-app-dev'],
     image_keys=[
         ('image.repository', 'image.tag')

@@ -1,0 +1,58 @@
+image:
+  repository: sample-web-app
+  tag: stable
+  pullPolicy: IfNotPresent
+
+imagePullSecrets:
+  - name: regcred
+
+env:
+  - name: NODE_ENV
+    value: "production"
+  - name: DATABASE_URL
+    valueFrom:
+      secretKeyRef:
+        name: db-credentials
+        key: database-url
+
+# Production database migration
+migration:
+  enabled: true
+  # Run as Helm Hook Job instead of init container
+  runAsJob: true
+  useAppImage: true
+  env:
+    - name: DATABASE_URL
+      valueFrom:
+        secretKeyRef:
+          name: db-credentials
+          key: database-url
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: app.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: app-tls
+      hosts:
+        - app.example.com
