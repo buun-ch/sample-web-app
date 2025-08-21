@@ -83,6 +83,58 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000) to view the application.
 
+### Development with Tilt
+
+[Tilt](https://tilt.dev/) provides a powerful development environment with hot reloading and automatic rebuilds.
+
+#### Prerequisites for Tilt
+
+- [Tilt](https://docs.tilt.dev/install.html) installed
+- Local Kubernetes cluster (Docker Desktop, minikube, kind, k3d, or Rancher Desktop)
+- kubectl configured to access your cluster
+
+#### Starting Development with Tilt
+
+Start Tilt with port forwarding:
+
+```bash
+tilt up -- --registry ghcr.io/yourusername --port-forward
+```
+
+Then open the URL: `http://localhost:13000`.
+
+If you use Telepresence, you can run:
+
+```bash
+tilt up -- --registry ghcr.io/yourusername
+```
+
+Then enable Telepresence connectivity:
+
+```bash
+telepresence connect
+```
+
+and open the URL: `http://sample-web-app-tilt.sample-web-app.svc:3000`.
+
+#### Customizing Tilt Development
+
+Edit `values-dev.yaml` to customize your development environment:
+
+- Environment variables
+- Resource limits
+- Database connections
+
+To deploy PostgreSQL alongside your app, uncomment the PostgreSQL section in `Tiltfile`.
+
+#### Stopping Tilt
+
+Press `Ctrl+C` in the terminal or run:
+
+```bash
+tilt down
+```
+
 ## Available Scripts
 
 ```bash

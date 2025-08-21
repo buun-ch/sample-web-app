@@ -1,0 +1,45 @@
+# -*- mode: Python -*-
+# https://docs.tilt.dev/
+
+allow_k8s_contexts(k8s_context())
+
+config.define_string('registry')
+config.define_bool('port-forward')
+
+cfg = config.parse()
+
+registry = cfg.get('registry', 'ghcr.io/your-username')
+default_registry(registry)
+
+load('ext://helm_resource', 'helm_resource', 'helm_repo')
+
+docker_build(
+    'sample-web-app-dev',
+    '.',
+    dockerfile='Dockerfile.dev',
+    live_update=[
+        # sync('.', '/app', ignore=['node_modules', '.next', '.git', 'charts']),
+        sync('.', '/app'),
+        run('pnpm install', trigger=['./package.json', './pnpm-lock.yaml']),
+    ]
+)
+
+helm_resource(
+    'sample-web-app',
+    './charts/sample-web-app',
+    release_name='sample-web-app-tilt',
+    flags=['--values=./values-dev.yaml'],
+    image_deps=['sample-web-app-dev'],
+    image_keys=[
+        ('image.repository', 'image.tag')
+    ]
+)
+
+enable_port_forwards = cfg.get('port-forward', False)
+k8s_resource(
+    'sample-web-app',
+    port_forwards='13000:3000' if enable_port_forwards else [],
+    labels=['app'],
+)
+if enable_port_forwards:
+    print("🚀 Access your application at: http://localhost:13000")
