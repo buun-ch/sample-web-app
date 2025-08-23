@@ -30,6 +30,10 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED=1
 
+# Set placeholder DATABASE_URL for build time only (will be overridden at runtime)
+ARG DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
+ENV DATABASE_URL=$DATABASE_URL
+
 RUN \
   if [ -f yarn.lock ]; then yarn run build; \
   elif [ -f package-lock.json ]; then npm run build; \
