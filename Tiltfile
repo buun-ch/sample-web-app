@@ -34,7 +34,7 @@ if extra_values_file:
 helm_resource(
     'sample-web-app',
     './charts/sample-web-app',
-    release_name='sample-web-app-tilt',
+    release_name='sample-web-app',
     flags=values_flags,
     image_deps=['sample-web-app-dev'],
     image_keys=[

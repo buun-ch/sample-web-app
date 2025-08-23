@@ -4,76 +4,52 @@
 
 This document describes the database migration strategy for the sample-web-app in Kubernetes environments.
 
-## Migration Methods
+## Migration Method
 
-### 1. Init Container (Development/Staging)
+### Init Container (All Environments)
 
-For development and staging environments, we use init containers that run before the main application container starts.
+We use init containers that run before the main application container starts. This is now the recommended approach for all environments including production.
 
 **Pros:**
 
-- Simple to implement
+- Simple to implement and maintain
 - Runs automatically with each pod deployment
-- Good for development where frequent schema changes occur
+- Ensures database is ready before application starts
+- Works well with modern deployment patterns
+- Follows Drizzle ORM best practices
 
-**Cons:**
+**Implementation:**
 
-- Runs on every pod start (can cause race conditions with multiple replicas)
-- Not suitable for production with multiple replicas
+- Uses `drizzle-orm` migrate() function (production recommended)
+- Lightweight dependency footprint
+- No external tools required beyond drizzle-orm and pg
 
-**Configuration (values-dev.yaml):**
-
-```yaml
-migration:
-  enabled: true
-  useAppImage: true
-
-initContainers:
-  - name: db-migrate
-    # ... migration configuration
-```
-
-### 2. Helm Hook Job (Production)
-
-For production environments, we use Kubernetes Jobs triggered by Helm hooks.
-
-**Pros:**
-
-- Runs only once during deployment
-- No race conditions
-- Can be rolled back if migration fails
-- Proper for production environments
-
-**Cons:**
-
-- More complex setup
-- Requires Helm for deployment
-
-**Configuration (values-prod.yaml):**
+**Configuration:**
 
 ```yaml
 migration:
   enabled: true
-  runAsJob: true  # This triggers Job instead of init container
-  useAppImage: true
+  env:
+    - name: DATABASE_URL
+      value: postgresql://user:pass@host:port/db
 ```
 
 ## Best Practices for Production
 
-### 1. Use Kubernetes Jobs with Helm Hooks
+### 1. Use Drizzle ORM's migrate() Function
 
-```yaml
-annotations:
-  "helm.sh/hook": pre-install,pre-upgrade
-  "helm.sh/hook-weight": "-5"
-  "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+The init container uses `drizzle-orm`'s programmatic migrate() function instead of `drizzle-kit push`:
+
+```javascript
+const { drizzle } = require('drizzle-orm/node-postgres');
+const { migrate } = require('drizzle-orm/node-postgres/migrator');
+await migrate(db, { migrationsFolder: './drizzle' });
 ```
 
-This ensures:
-
-- Migration runs before application deployment
-- Old migration jobs are cleaned up
-- Failed migrations prevent deployment
+**Benefits:**
+- Lightweight (no drizzle-kit dependencies)
+- Production-optimized
+- Proper migration history tracking
 
 ### 2. Separate Database Credentials
 
@@ -88,14 +64,18 @@ env:
         key: database-url
 ```
 
-### 3. Use Dedicated Migration Tools
+### 3. Migration File Generation
 
-For complex migrations, consider:
+Generate migration files during development:
 
-- **Prisma Migrate**: Built-in migration system with `prisma migrate deploy`
-- **Flyway**: Java-based migration tool
-- **Liquibase**: Database-independent migration tool
-- **golang-migrate**: Lightweight migration tool
+```bash
+# Generate migration files
+pnpm db:generate
+
+# Commit generated files to version control
+git add drizzle/
+git commit -m "feat: add new database migration"
+```
 
 ### 4. Migration Image Strategy
 
@@ -153,9 +133,9 @@ kubectl exec -it <pod-name> -- pnpm db:push
 
 ## Recommended Production Setup
 
-1. Use Helm Hook Jobs for migrations
-2. Store credentials in Kubernetes Secrets or external secret managers
+1. Use Init Container with drizzle-orm migrate() function
+2. Store credentials in Kubernetes Secrets or external secret managers  
 3. Use dedicated migration credentials with appropriate permissions
-4. Implement proper monitoring and alerting
+4. Generate migration files during development and commit to version control
 5. Test migrations in staging environment first
-6. Have a rollback plan ready
+6. Monitor init container logs for migration status

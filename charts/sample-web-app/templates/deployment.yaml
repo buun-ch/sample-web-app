@@ -32,8 +32,31 @@ spec:
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .Values.initContainers }}
       initContainers:
+      {{- if .Values.migration.enabled }}
+        - name: migration
+          {{- if .Values.migration.image }}
+          image: {{ .Values.migration.image }}
+          {{- else }}
+          image: {{ include "sample-web-app.image" . }}
+          {{- end }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ['/bin/sh']
+          args: ['/migration/migrate.sh']
+          env:
+          {{- if .Values.migration.env }}
+          {{- toYaml .Values.migration.env | nindent 10 }}
+          {{- else }}
+          {{- with .Values.env }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+          {{- end }}
+          volumeMounts:
+            - name: migration-script
+              mountPath: /migration
+          workingDir: /app
+      {{- end }}
+      {{- if .Values.initContainers }}
         {{- include "sample-web-app.initContainers" . | nindent 8 }}
       {{- end }}
       containers:

@@ -18,8 +18,6 @@ env:
 # Production database migration
 migration:
   enabled: true
-  # Run as Helm Hook Job instead of init container
-  runAsJob: true
   useAppImage: true
   env:
     - name: DATABASE_URL
