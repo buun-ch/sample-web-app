@@ -9,11 +9,8 @@ config.define_string('extra-values-file')
 
 cfg = config.parse()
 
-load('ext://helm_resource', 'helm_resource', 'helm_repo')
-
 registry = cfg.get('registry', 'localhost:30500')
 default_registry(registry)
-
 
 docker_build(
     'sample-web-app-dev',
@@ -25,28 +22,23 @@ docker_build(
     ]
 )
 
-values_flags = ['--values=./charts/sample-web-app/values-dev.yaml']
+values_files = ['./charts/sample-web-app/values-dev.yaml']
 extra_values_file = cfg.get('extra-values-file', '')
 if extra_values_file:
-    values_flags.append('--values=' + extra_values_file)
+    values_files.append(extra_values_file)
     print("📝 Using extra values file: " + extra_values_file)
 
-helm_resource(
-    'sample-web-app',
+helm_release = helm(
     './charts/sample-web-app',
-    release_name='sample-web-app',
-    flags=values_flags,
-    image_deps=['sample-web-app-dev'],
-    image_keys=[
-        ('image.repository', 'image.tag')
-    ]
+    name='sample-web-app',
+    values=values_files,
 )
+k8s_yaml(helm_release)
 
 enable_port_forwards = cfg.get('port-forward', False)
 k8s_resource(
     'sample-web-app',
     port_forwards='13000:3000' if enable_port_forwards else [],
-    labels=['app'],
 )
 if enable_port_forwards:
     print("🚀 Access your application at: http://localhost:13000")

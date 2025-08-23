@@ -23,13 +23,6 @@ out/
 .DS_Store
 Thumbs.db
 
-# Charts and deployment files
-charts/
-Tiltfile
-values*.yaml
-*.dockerfile
-Dockerfile*
-
 # Logs
 *.log
 npm-debug.log*
@@ -38,8 +31,3 @@ yarn-error.log*
 
 # Environment files (handled separately)
 # .env*
-
-# Package manager files
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
