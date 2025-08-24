@@ -36,7 +36,7 @@ This is a an example ToDo application built with Next.js 15.4 and Drizzle ORM. I
 #### Clone the repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/buun-ch/sample-web-app
 cd sample-web-app
 ```
 
