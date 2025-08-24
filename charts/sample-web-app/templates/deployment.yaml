@@ -71,9 +71,17 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
-          {{- with .Values.env }}
           env:
+          {{- with .Values.env }}
             {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if not .Values.telemetry.enabled }}
+            - name: NEXT_TELEMETRY_DISABLED
+              value: "1"
+          {{- end }}
+          {{- if not .Values.logging.health_request }}
+            - name: DISABLE_HEALTH_REQUEST_LOGS
+              value: "1"
           {{- end }}
           {{- with .Values.envFrom }}
           envFrom:

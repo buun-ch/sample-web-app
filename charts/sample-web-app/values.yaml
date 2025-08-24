@@ -137,6 +137,12 @@ tolerations: []
 
 affinity: {}
 
+telemetry:
+  enabled: false
+
+logging:
+  health_request: true  # Enable/disable health check request logs
+
 # Environment variables to set in the container
 env: []
 # - name: DATABASE_URL

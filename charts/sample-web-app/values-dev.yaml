@@ -2,6 +2,12 @@ image:
   repository: sample-web-app-dev
   pullPolicy: IfNotPresent
 
+telemetry:
+  enabled: true
+
+logging:
+  health_request: false  # Enable/disable health check request logs
+
 env:
   - name: NODE_ENV
     value: "development"

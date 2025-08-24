@@ -6,6 +6,7 @@ allow_k8s_contexts(k8s_context())
 config.define_string('registry')
 config.define_bool('port-forward')
 config.define_string('extra-values-file')
+config.define_bool('enable-health-logs')
 
 cfg = config.parse()
 
@@ -28,10 +29,17 @@ if extra_values_file:
     values_files.append(extra_values_file)
     print("📝 Using extra values file: " + extra_values_file)
 
+helm_set_values = []
+enable_health_logs = cfg.get('enable-health-logs', False)
+if enable_health_logs:
+    helm_set_values.append('logging.health_request=true')
+    print("📵 Health check request logs enabled")
+
 helm_release = helm(
     './charts/sample-web-app',
     name='sample-web-app',
     values=values_files,
+    set=helm_set_values,
 )
 k8s_yaml(helm_release)
 
