@@ -10,6 +10,18 @@ spec:
   containers:
     - name: wget
       image: busybox
-      command: ['wget']
-      args: ['{{ include "sample-web-app.fullname" . }}:{{ .Values.service.port }}']
+      command: ['sh', '-c']
+      args: 
+        - |
+          echo "Waiting for service to be ready..."
+          for i in $(seq 1 30); do
+            if wget --spider -q {{ include "sample-web-app.fullname" . }}:{{ .Values.service.port }}/healthz; then
+              echo "Service is ready!"
+              exit 0
+            fi
+            echo "Attempt $i/30 failed, waiting..."
+            sleep 2
+          done
+          echo "Service failed to become ready"
+          exit 1
   restartPolicy: Never
