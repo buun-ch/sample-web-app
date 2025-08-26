@@ -1,0 +1,34 @@
+apiVersion: skaffold/v4beta11
+kind: Config
+metadata:
+  name: sample-web-app
+build:
+  artifacts:
+    - image: localhost:30500/sample-web-app
+      docker:
+        dockerfile: Dockerfile.dev
+      sync:
+        manual:
+          - src: "**/*"
+            dest: /app
+            strip: ""
+  local:
+    push: true
+  insecureRegistries:
+    - localhost:30500
+manifests:
+  helm:
+    releases:
+      - name: sample-web-app
+        chartPath: ./charts/sample-web-app
+        valuesFiles:
+          - ./charts/sample-web-app/values-dev.yaml
+        setValueTemplates:
+          image.repository: "{{.IMAGE_REPO_localhost_30500_sample_web_app}}"
+          image.tag: "{{.IMAGE_TAG_localhost_30500_sample_web_app}}@{{.IMAGE_DIGEST_localhost_30500_sample_web_app}}"
+        skipBuildDependencies: true
+portForward:
+  - resourceType: service
+    resourceName: sample-web-app
+    port: 3000
+    localPort: 13000
